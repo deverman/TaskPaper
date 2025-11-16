@@ -4,7 +4,7 @@ A modern Swift library for parsing TaskPaper formatted plain text documents. Thi
 
 ## Features
 
-- **Swift 6.0+** compatible with strict concurrency checking
+- **Swift 6.2.1** fully compatible with complete concurrency safety
 - **Cross-platform**: Works on macOS, iOS, tvOS, watchOS, and Linux
 - **Fast parsing** based on the [birch-outline](https://github.com/jessegrosjean/birch-outline) algorithm
 - **Tree structure** with parent-child relationships
@@ -15,7 +15,7 @@ A modern Swift library for parsing TaskPaper formatted plain text documents. Thi
 
 ## Requirements
 
-- Swift 6.0 or later
+- Swift 6.0 or later (tested with Swift 6.2.1)
 - macOS 13.0+ / iOS 16.0+ / tvOS 16.0+ / watchOS 9.0+ (when using Apple platforms)
 - Linux (Ubuntu 20.04+)
 
