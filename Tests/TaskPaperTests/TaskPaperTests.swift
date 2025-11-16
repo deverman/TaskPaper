@@ -1,88 +1,100 @@
-import XCTest
+import Testing
 @testable import TaskPaper
 
-class TaskPaperTests: XCTestCase {
+@Suite("TaskPaper Parser Tests")
+struct TaskPaperTests {
 
 	// MARK: - Basic Parsing Tests
 
-	func testParseEmptyString() {
+	@Test("Parse empty string")
+	func parseEmptyString() {
 		let doc = TaskPaper("")
-		XCTAssertEqual(doc.items.count, 0, "Empty string should produce no items")
+		#expect(doc.items.count == 0)
 	}
 
-	func testParseSingleNote() {
+	@Test("Parse single note")
+	func parseSingleNote() {
 		let doc = TaskPaper("This is a note\n")
-		XCTAssertEqual(doc.items.count, 1)
-		XCTAssertEqual(doc.items[0].type, .note)
-		XCTAssertEqual(doc.items[0].children.count, 0)
+		#expect(doc.items.count == 1)
+		#expect(doc.items[0].type == .note)
+		#expect(doc.items[0].children.count == 0)
 	}
 
-	func testParseSingleTask() {
+	@Test("Parse single task")
+	func parseSingleTask() {
 		let doc = TaskPaper("- This is a task\n")
-		XCTAssertEqual(doc.items.count, 1)
-		XCTAssertEqual(doc.items[0].type, .task)
-		XCTAssertEqual(doc.items[0].children.count, 0)
+		#expect(doc.items.count == 1)
+		#expect(doc.items[0].type == .task)
+		#expect(doc.items[0].children.count == 0)
 	}
 
-	func testParseSingleProject() {
+	@Test("Parse single project")
+	func parseSingleProject() {
 		let doc = TaskPaper("Project:\n")
-		XCTAssertEqual(doc.items.count, 1)
-		XCTAssertEqual(doc.items[0].type, .project)
-		XCTAssertEqual(doc.items[0].children.count, 0)
+		#expect(doc.items.count == 1)
+		#expect(doc.items[0].type == .project)
+		#expect(doc.items[0].children.count == 0)
 	}
 
-	func testParseMultipleRootItems() {
+	@Test("Parse multiple root items")
+	func parseMultipleRootItems() {
 		let input = """
 		First item
 		- Second item
 		Third item:
 		"""
 		let doc = TaskPaper(input)
-		XCTAssertEqual(doc.items.count, 3)
-		XCTAssertEqual(doc.items[0].type, .note)
-		XCTAssertEqual(doc.items[1].type, .task)
-		XCTAssertEqual(doc.items[2].type, .project)
+		#expect(doc.items.count == 3)
+		#expect(doc.items[0].type == .note)
+		#expect(doc.items[1].type == .task)
+		#expect(doc.items[2].type == .project)
 	}
 
 	// MARK: - Task Marker Tests
 
-	func testTaskWithDashMarker() {
+	@Test("Task with dash marker")
+	func taskWithDashMarker() {
 		let doc = TaskPaper("- Task with dash\n")
-		XCTAssertEqual(doc.items[0].type, .task)
+		#expect(doc.items[0].type == .task)
 	}
 
-	func testTaskWithAsteriskMarker() {
+	@Test("Task with asterisk marker")
+	func taskWithAsteriskMarker() {
 		let doc = TaskPaper("* Task with asterisk\n")
-		XCTAssertEqual(doc.items[0].type, .task)
+		#expect(doc.items[0].type == .task)
 	}
 
-	func testTaskWithPlusMarker() {
+	@Test("Task with plus marker")
+	func taskWithPlusMarker() {
 		let doc = TaskPaper("+ Task with plus\n")
-		XCTAssertEqual(doc.items[0].type, .task)
+		#expect(doc.items[0].type == .task)
 	}
 
-	func testTaskWithBackslashMarker() {
+	@Test("Task with backslash marker")
+	func taskWithBackslashMarker() {
 		let doc = TaskPaper("\\ Task with backslash\n")
-		XCTAssertEqual(doc.items[0].type, .task)
+		#expect(doc.items[0].type == .task)
 	}
 
 	// MARK: - Hierarchy Tests
 
-	func testNestedItems() {
+	@Test("Nested items")
+	func nestedItems() {
 		let input = """
 		Project:
 			- Task one
 			- Task two
 		"""
 		let doc = TaskPaper(input)
-		XCTAssertEqual(doc.items.count, 1, "Should have 1 root item")
-		XCTAssertEqual(doc.items[0].type, .project)
-		XCTAssertEqual(doc.items[0].children.count, 2, "Project should have 2 children")
-		XCTAssertEqual(doc.items[0].children[0].type, .task)
-		XCTAssertEqual(doc.items[0].children[1].type, .task)
+		#expect(doc.items.count == 1)
+		#expect(doc.items[0].type == .project)
+		#expect(doc.items[0].children.count == 2)
+		#expect(doc.items[0].children[0].type == .task)
+		#expect(doc.items[0].children[1].type == .task)
 	}
 
-	func testDeeplyNestedItems() {
+	@Test("Deeply nested items")
+	func deeplyNestedItems() {
 		let input = """
 		Level 1:
 			Level 2:
@@ -90,26 +102,27 @@ class TaskPaperTests: XCTestCase {
 					- Level 4 task
 		"""
 		let doc = TaskPaper(input)
-		XCTAssertEqual(doc.items.count, 1)
+		#expect(doc.items.count == 1)
 
 		let level1 = doc.items[0]
-		XCTAssertEqual(level1.type, .project)
-		XCTAssertEqual(level1.children.count, 1)
+		#expect(level1.type == .project)
+		#expect(level1.children.count == 1)
 
 		let level2 = level1.children[0]
-		XCTAssertEqual(level2.type, .project)
-		XCTAssertEqual(level2.children.count, 1)
+		#expect(level2.type == .project)
+		#expect(level2.children.count == 1)
 
 		let level3 = level2.children[0]
-		XCTAssertEqual(level3.type, .project)
-		XCTAssertEqual(level3.children.count, 1)
+		#expect(level3.type == .project)
+		#expect(level3.children.count == 1)
 
 		let level4 = level3.children[0]
-		XCTAssertEqual(level4.type, .task)
-		XCTAssertEqual(level4.children.count, 0)
+		#expect(level4.type == .task)
+		#expect(level4.children.count == 0)
 	}
 
-	func testParentReferences() {
+	@Test("Parent references")
+	func parentReferences() {
 		let input = """
 		Project:
 			- Task
@@ -118,91 +131,144 @@ class TaskPaperTests: XCTestCase {
 		let project = doc.items[0]
 		let task = project.children[0]
 
-		XCTAssertNil(project.parent, "Root item should have no parent")
-		XCTAssertNotNil(task.parent, "Child should have parent")
-		XCTAssertTrue(task.parent === project, "Child's parent should be the project")
+		#expect(project.parent == nil)
+		#expect(task.parent != nil)
+		#expect(task.parent === project)
 	}
 
 	// MARK: - Tag Tests
 
-	func testSimpleTag() {
+	@Test("Simple tag")
+	func simpleTag() {
 		let doc = TaskPaper("- Task @done\n")
 		let item = doc.items[0]
-		XCTAssertEqual(item.tags.count, 1)
+		#expect(item.tags.count == 1)
 
 		let tag = item["done"]
-		XCTAssertNotNil(tag)
-		XCTAssertEqual(tag?.name, "done")
-		XCTAssertNil(tag?.value)
+		#expect(tag != nil)
+		#expect(tag?.name == "done")
+		#expect(tag?.value == nil)
 	}
 
-	func testTagWithValue() {
+	@Test("Tag with value")
+	func tagWithValue() {
 		let doc = TaskPaper("- Task @priority(high)\n")
 		let item = doc.items[0]
-		XCTAssertEqual(item.tags.count, 1)
+		#expect(item.tags.count == 1)
 
 		let tag = item["priority"]
-		XCTAssertNotNil(tag)
-		XCTAssertEqual(tag?.name, "priority")
-		XCTAssertEqual(tag?.value, "high")
+		#expect(tag != nil)
+		#expect(tag?.name == "priority")
+		#expect(tag?.value == "high")
 	}
 
-	func testMultipleTags() {
+	@Test("Multiple tags")
+	func multipleTags() {
 		let doc = TaskPaper("- Task @done @priority(1) @today\n")
 		let item = doc.items[0]
-		XCTAssertEqual(item.tags.count, 3)
+		#expect(item.tags.count == 3)
 
-		XCTAssertNotNil(item["done"])
-		XCTAssertNotNil(item["priority"])
-		XCTAssertNotNil(item["today"])
+		#expect(item["done"] != nil)
+		#expect(item["priority"] != nil)
+		#expect(item["today"] != nil)
 
-		XCTAssertEqual(item["priority"]?.value, "1")
+		#expect(item["priority"]?.value == "1")
 	}
 
-	func testTagLookupNonExistent() {
+	@Test("Tag lookup non-existent")
+	func tagLookupNonExistent() {
 		let doc = TaskPaper("- Task @done\n")
 		let item = doc.items[0]
-		XCTAssertNil(item["notfound"])
+		#expect(item["notfound"] == nil)
 	}
 
-	func testTagsOnProject() {
+	@Test("Tags on project")
+	func tagsOnProject() {
 		let doc = TaskPaper("Project @archived:\n")
 		let item = doc.items[0]
-		XCTAssertEqual(item.type, .project)
-		XCTAssertEqual(item.tags.count, 1)
-		XCTAssertNotNil(item["archived"])
+		#expect(item.type == .project)
+		#expect(item.tags.count == 1)
+		#expect(item["archived"] != nil)
 	}
 
-	func testTagsOnNote() {
+	@Test("Tags on note")
+	func tagsOnNote() {
 		let doc = TaskPaper("Note with @tag\n")
 		let item = doc.items[0]
-		XCTAssertEqual(item.type, .note)
-		XCTAssertEqual(item.tags.count, 1)
-		XCTAssertNotNil(item["tag"])
+		#expect(item.type == .note)
+		#expect(item.tags.count == 1)
+		#expect(item["tag"] != nil)
+	}
+
+	// MARK: - OmniFocus Compatibility Tests
+
+	@Test("OmniFocus defer tag")
+	func omniFocusDeferTag() {
+		let doc = TaskPaper("- Task @defer(2024-12-25)\n")
+		let item = doc.items[0]
+		#expect(item["defer"]?.value == "2024-12-25")
+	}
+
+	@Test("OmniFocus due tag")
+	func omniFocusDueTag() {
+		let doc = TaskPaper("- Task @due(2024-12-31)\n")
+		let item = doc.items[0]
+		#expect(item["due"]?.value == "2024-12-31")
+	}
+
+	@Test("OmniFocus flagged tag")
+	func omniFocusFlaggedTag() {
+		let doc = TaskPaper("- Task @flagged\n")
+		let item = doc.items[0]
+		#expect(item["flagged"] != nil)
+		#expect(item["flagged"]?.value == nil)
+	}
+
+	@Test("OmniFocus estimate tag")
+	func omniFocusEstimateTag() {
+		let doc = TaskPaper("- Task @estimate(2h)\n")
+		let item = doc.items[0]
+		#expect(item["estimate"]?.value == "2h")
+	}
+
+	@Test("OmniFocus parallel tag")
+	func omniFocusParallelTag() {
+		let doc = TaskPaper("Project @parallel(true):\n")
+		let item = doc.items[0]
+		#expect(item["parallel"]?.value == "true")
+	}
+
+	@Test("OmniFocus tags parameter")
+	func omniFocusTagsParameter() {
+		let doc = TaskPaper("- Task @tags(work, urgent)\n")
+		let item = doc.items[0]
+		#expect(item["tags"]?.value == "work, urgent")
 	}
 
 	// MARK: - Tag Scanner Tests
 
-	func testTagRegex() {
+	@Test("Tag scanner")
+	func tagScanner() {
 		let str = "@a(b) c @d @e" as NSString
 		let results = scanForTags(in: str, range: NSMakeRange(0, str.length))
 
-		XCTAssertEqual(results.count, 3, "Should find 3 tags")
+		#expect(results.count == 3)
 
 		// First tag: @a(b)
-		XCTAssertEqual(str.substring(with: results[0][1]), "a")
-		XCTAssertEqual(str.substring(with: results[0][2]), "b")
+		#expect(str.substring(with: results[0][1]) == "a")
+		#expect(str.substring(with: results[0][2]) == "b")
 
 		// Second tag: @d
-		XCTAssertEqual(str.substring(with: results[1][1]), "d")
+		#expect(str.substring(with: results[1][1]) == "d")
 
 		// Third tag: @e
-		XCTAssertEqual(str.substring(with: results[2][1]), "e")
+		#expect(str.substring(with: results[2][1]) == "e")
 	}
 
 	// MARK: - Traversal Tests
 
-	func testEnumerateFlat() {
+	@Test("Enumerate flat structure")
+	func enumerateFlat() {
 		let input = """
 		First
 		Second
@@ -215,10 +281,11 @@ class TaskPaperTests: XCTestCase {
 				count += 1
 			}
 		}
-		XCTAssertEqual(count, 3, "Should enumerate all 3 items")
+		#expect(count == 3)
 	}
 
-	func testEnumerateNested() {
+	@Test("Enumerate nested structure")
+	func enumerateNested() {
 		let input = """
 		Project:
 			- Task 1
@@ -230,10 +297,11 @@ class TaskPaperTests: XCTestCase {
 		doc.items[0].enumerate { _ in
 			count += 1
 		}
-		XCTAssertEqual(count, 4, "Should enumerate project + 2 tasks + 1 note = 4 items")
+		#expect(count == 4)
 	}
 
-	func testEnumerateOrder() {
+	@Test("Enumerate order is depth-first")
+	func enumerateOrder() {
 		let input = """
 		A:
 			B
@@ -252,12 +320,13 @@ class TaskPaperTests: XCTestCase {
 			}
 		}
 
-		XCTAssertEqual(visited, ["A", "B", "C", "D"], "Should visit in depth-first order")
+		#expect(visited == ["A", "B", "C", "D"])
 	}
 
 	// MARK: - Source Range Tests
 
-	func testSourceRangeIncludingChildren() {
+	@Test("Source range including children")
+	func sourceRangeIncludingChildren() {
 		let input = """
 		Project:
 			Child 1
@@ -271,24 +340,26 @@ class TaskPaperTests: XCTestCase {
 		let str = input as NSString
 		let extracted = str.substring(with: range)
 
-		XCTAssertTrue(extracted.contains("Project:"))
-		XCTAssertTrue(extracted.contains("Child 1"))
-		XCTAssertTrue(extracted.contains("Child 2"))
-		XCTAssertFalse(extracted.contains("Next item"))
+		#expect(extracted.contains("Project:"))
+		#expect(extracted.contains("Child 1"))
+		#expect(extracted.contains("Child 2"))
+		#expect(!extracted.contains("Next item"))
 	}
 
 	// MARK: - Option Tests
 
-	func testNormalizeOption() {
+	@Test("Normalize option handles Windows line endings")
+	func normalizeOption() {
 		// Test with Windows-style line endings
 		let input = "Line 1\r\nLine 2\r\nLine 3"
 		let doc = TaskPaper(input, options: .normalize)
-		XCTAssertEqual(doc.items.count, 3, "Should parse 3 lines even with \\r\\n endings")
+		#expect(doc.items.count == 3)
 	}
 
 	// MARK: - Complex Document Test
 
-	func testComplexDocument() {
+	@Test("Complex document parsing")
+	func complexDocument() {
 		let input = """
 		Shopping List @today:
 			Groceries:
@@ -307,37 +378,38 @@ class TaskPaperTests: XCTestCase {
 		let doc = TaskPaper(input)
 
 		// Verify structure
-		XCTAssertEqual(doc.items.count, 2, "Should have 2 root items")
+		#expect(doc.items.count == 2)
 
 		// Shopping List checks
 		let shopping = doc.items[0]
-		XCTAssertEqual(shopping.type, .project)
-		XCTAssertNotNil(shopping["today"])
-		XCTAssertEqual(shopping.children.count, 2)
+		#expect(shopping.type == .project)
+		#expect(shopping["today"] != nil)
+		#expect(shopping.children.count == 2)
 
 		let groceries = shopping.children[0]
-		XCTAssertEqual(groceries.type, .project)
-		XCTAssertEqual(groceries.children.count, 3)
-		XCTAssertEqual(groceries.children[0].type, .task)
-		XCTAssertNotNil(groceries.children[0]["priority"])
+		#expect(groceries.type == .project)
+		#expect(groceries.children.count == 3)
+		#expect(groceries.children[0].type == .task)
+		#expect(groceries.children[0]["priority"] != nil)
 
 		// Work checks
 		let work = doc.items[1]
-		XCTAssertEqual(work.type, .project)
-		XCTAssertNotNil(work["context"])
-		XCTAssertEqual(work["context"]?.value, "office")
+		#expect(work.type == .project)
+		#expect(work["context"] != nil)
+		#expect(work["context"]?.value == "office")
 
 		// Count all items via enumeration
 		var totalItems = 0
 		for root in doc.items {
 			root.enumerate { _ in totalItems += 1 }
 		}
-		XCTAssertEqual(totalItems, 13, "Should have 13 total items in the tree")
+		#expect(totalItems == 13)
 	}
 
 	// MARK: - Edge Cases
 
-	func testEmptyLines() {
+	@Test("Empty lines are parsed as notes")
+	func emptyLines() {
 		let input = """
 		First
 
@@ -346,23 +418,26 @@ class TaskPaperTests: XCTestCase {
 		"""
 		let doc = TaskPaper(input)
 		// Empty lines are still parsed as notes
-		XCTAssertEqual(doc.items.count, 4)
+		#expect(doc.items.count == 4)
 	}
 
-	func testProjectWithoutColon() {
+	@Test("Project without colon is a note")
+	func projectWithoutColon() {
 		let doc = TaskPaper("Not a project\n")
-		XCTAssertEqual(doc.items[0].type, .note, "Line without colon should be a note")
+		#expect(doc.items[0].type == .note)
 	}
 
-	func testTaskWithoutSpace() {
+	@Test("Task without space after marker is a note")
+	func taskWithoutSpace() {
 		let doc = TaskPaper("-NoSpace\n")
 		// Should be a note since there's no space after the dash
-		XCTAssertEqual(doc.items[0].type, .note)
+		#expect(doc.items[0].type == .note)
 	}
 
 	// MARK: - Performance Test
 
-	func testBenchmark() {
+	@Test("Benchmark parsing performance", .timeLimit(.minutes(1)))
+	func benchmark() {
 		let str = "one:\n\t- two\n\t\t- three\n\t- four\n five\n\t- six\n seven:\n\t eight\n\t- nine\n- ten\n"
 		var input = str
 
@@ -370,9 +445,10 @@ class TaskPaperTests: XCTestCase {
 			input += str
 		}
 
-		measure {
-			let _ = TaskPaper(input)
-		}
+		// Parse the large document
+		let _ = TaskPaper(input)
+
+		// Performance is measured by the time limit trait
 	}
 
 }
