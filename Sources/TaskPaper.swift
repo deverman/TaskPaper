@@ -1,30 +1,91 @@
 
 import Foundation
 
+/// A parser for TaskPaper formatted plain text documents.
+///
+/// TaskPaper is a simple, plain text format for creating outlines and to-do lists.
+/// Documents consist of items organized in a hierarchical structure using indentation (tabs).
+///
+/// ## Parsing
+/// Create a TaskPaper instance by passing a string to parse:
+///
+/// ```swift
+/// let document = TaskPaper("""
+///     Shopping:
+///         - Buy milk @today
+///         - Get bread
+///     Work:
+///         - Finish report @due(2024-12-31)
+///     """)
+/// ```
+///
+/// ## Item Structure
+/// The parser creates a tree of `Item` objects accessible via the `items` property.
+/// Each item can have:
+/// - A type (task, project, or note)
+/// - Child items (nested items)
+/// - Tags for metadata
+/// - Source ranges for AST applications
+///
+/// ## Traversing Items
+/// ```swift
+/// for item in document.items {
+///     item.enumerate { descendant in
+///         print(descendant.type)
+///     }
+/// }
+/// ```
 public struct TaskPaper {
-	
-	public struct Options: OptionSet {
+
+	/// Options for parsing TaskPaper documents.
+	public struct Options: OptionSet, Sendable {
 		public let rawValue: Int
-		
+
 		public init(rawValue: Int) {
 			self.rawValue = rawValue
 		}
-		
+
+		/// Normalize line endings to Unix style (\\n) before parsing.
+		///
+		/// This converts Windows (\\r\\n) and classic Mac (\\r) line endings to Unix (\\n).
 		public static let normalize = Options(rawValue: 1 << 0)
 	}
-	
+
+	/// The root-level items in the parsed document.
+	///
+	/// Items that are not indented appear at this level. Items that are indented
+	/// are children of other items and can be accessed via the `children` property.
 	public var items: [Item] = []
-	
+
+	/// Parses a TaskPaper formatted string into a structured document.
+	///
+	/// The parser processes the input line-by-line, building a tree structure based on indentation.
+	/// Each line becomes an `Item` with an appropriate type (task, project, or note).
+	///
+	/// - Parameters:
+	///   - string: The TaskPaper formatted text to parse
+	///   - options: Parsing options (defaults to empty, no special processing)
+	///
+	/// ## Example
+	/// ```swift
+	/// let doc = TaskPaper("""
+	///     Project:
+	///         - Task @done
+	///         Note text
+	///     """)
+	/// print(doc.items.count) // 1 (the project)
+	/// print(doc.items[0].children.count) // 2 (task and note)
+	/// ```
 	public init(_ string: String, options: Options=[]) {
 		var input = string
-		
+
 		if options.contains(.normalize) {
 			input = (string as NSString).replacingOccurrences(of: "(\r\n|\n|\r)", with: "\n", options: .regularExpression, range: NSMakeRange(0, (string as NSString).length))
 		}
-		
+
 		parse(input as NSString)
 	}
-	
+
 }
 
 extension TaskPaper {
