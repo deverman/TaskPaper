@@ -27,7 +27,7 @@ Add TaskPaper as a dependency in your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/YOUR_USERNAME/TaskPaper.git", from: "1.0.0")
+    .package(url: "https://github.com/deverman/TaskPaper.git", from: "1.0.0")
 ]
 ```
 
@@ -44,7 +44,7 @@ targets: [
 ### Xcode
 
 1. In Xcode, select **File → Add Package Dependencies...**
-2. Enter the repository URL: `https://github.com/YOUR_USERNAME/TaskPaper.git`
+2. Enter the repository URL: `https://github.com/deverman/TaskPaper.git`
 3. Select the version you want to use
 4. Add the package to your target
 
