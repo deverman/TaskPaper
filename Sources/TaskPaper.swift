@@ -38,7 +38,7 @@ import Foundation
 public struct TaskPaper {
 
 	/// Options for parsing TaskPaper documents.
-	public struct Options: OptionSet {
+	public struct Options: OptionSet, Sendable {
 		public let rawValue: Int
 
 		public init(rawValue: Int) {

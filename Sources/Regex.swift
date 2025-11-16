@@ -140,7 +140,8 @@ func scanForTags(in string: NSString, range: NSRange) -> [ScanResult] {
 		}
 		
 		if i < NSMaxRange(range) {
-			guard string.character(at: i).isWhitespace else {
+			let nextChar = string.character(at: i)
+			guard nextChar.isWhitespace || nextChar == UTF16.colon else {
 				cursor += 1
 				continue
 			}

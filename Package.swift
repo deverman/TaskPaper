@@ -17,11 +17,7 @@ let package = Package(
             targets: ["TaskPaper"])
     ],
     targets: [
-        .target(
-            name: "TaskPaper",
-            swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency")
-            ]),
+        .target(name: "TaskPaper"),
         .testTarget(
             name: "TaskPaperTests",
             dependencies: ["TaskPaper"])

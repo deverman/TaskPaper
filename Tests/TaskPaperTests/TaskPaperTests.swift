@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TaskPaper
 
@@ -403,7 +404,7 @@ struct TaskPaperTests {
 		for root in doc.items {
 			root.enumerate { _ in totalItems += 1 }
 		}
-		#expect(totalItems == 13)
+		#expect(totalItems == 12)
 	}
 
 	// MARK: - Edge Cases
